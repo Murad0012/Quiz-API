@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.DTOs.Question;
 
@@ -17,8 +16,8 @@ namespace WebApplication1.Controllers
             _mapper = mapper;
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, QuestionPutDto dto)
+        [HttpPut("UpdateQuestion/{id}")]
+        public IActionResult UpdateQuestion(int id, QuestionPutDto dto)
         {
             var question = _dbContext.Questions.FirstOrDefault(x => x.Id == id);
 

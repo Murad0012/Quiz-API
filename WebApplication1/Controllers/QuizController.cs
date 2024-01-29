@@ -30,14 +30,14 @@ namespace WebApplication1.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult GetById(int id)
         {
             var quiz = _dbContext.Quizzes.Include(q => q.Questions).ThenInclude(q => q.Options).SingleOrDefault(x => x.Id == id);
 
             if (quiz == null) return NotFound();
-            
-            var dto = _mapper.Map<Quiz,QuizDetailedGetDto>(quiz);
-            
+
+            var dto = _mapper.Map<Quiz, QuizDetailedGetDto>(quiz);
+
             return Ok(dto);
         }
 
