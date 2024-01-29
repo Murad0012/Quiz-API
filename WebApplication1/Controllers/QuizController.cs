@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
@@ -9,6 +10,7 @@ namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class QuizController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
@@ -21,6 +23,8 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+
         public IActionResult Get()
         {
             var quiz = _dbContext.Quizzes.AsNoTracking().Select(x => _mapper.Map<Quiz,QuizGetDto>(x)).ToList();
@@ -30,6 +34,8 @@ namespace WebApplication1.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize]
+
         public IActionResult GetById(int id)
         {
             var quiz = _dbContext.Quizzes.Include(q => q.Questions).ThenInclude(q => q.Options).SingleOrDefault(x => x.Id == id);
@@ -42,6 +48,8 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Post([FromBody] QuizPostDto dto)
         {
             var quiz = _mapper.Map<QuizPostDto, Quiz>(dto);
@@ -53,6 +61,8 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Put([FromBody] QuizPutDto dto, int id)
         {
             var quiz = _dbContext.Quizzes.FirstOrDefault(x => x.Id == id);
@@ -67,6 +77,8 @@ namespace WebApplication1.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Delete(int id)
         {
             var quiz = _dbContext.Quizzes.Include(q => q.Questions).ThenInclude(q => q.Options).SingleOrDefault(x => x.Id == id);

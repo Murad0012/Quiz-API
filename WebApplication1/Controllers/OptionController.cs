@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Data;
 using WebApplication1.DTOs.Option;
 
 namespace WebApplication1.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(Roles = "Admin")]
+
     public class OptionController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
