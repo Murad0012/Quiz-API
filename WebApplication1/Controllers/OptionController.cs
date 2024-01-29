@@ -1,26 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.DTOs.Option;
 
 namespace WebApplication1.Controllers
 {
-    public class OptionController : Controller
+    public class OptionController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
-        public OptionController(AppDbContext dbContext)
+        private readonly IMapper _mapper;
+
+        public OptionController(AppDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
-        public IActionResult Put(int id, OptionPutDto model)
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, OptionPutDto dto)
         {
-            var foundOption = _dbContext.Options.FirstOrDefault(x => x.Id == id);
+            var option = _dbContext.Options.FirstOrDefault(x => x.Id == id);
+                    
+            if (option == null) return NotFound();
 
-            if (foundOption is null) return NotFound();
+            _mapper.Map(dto, option);
 
-            foundOption.Name = model.Name;
-            foundOption.isCorrect = model.isCorrect;
-
+            _dbContext.Update(option);
             _dbContext.SaveChanges();
 
             return Ok();

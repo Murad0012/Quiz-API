@@ -7,7 +7,9 @@ using WebApplication1.Entities;
 
 namespace WebApplication1.Controllers
 {
-    public class QuizController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class QuizController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -18,26 +20,64 @@ namespace WebApplication1.Controllers
             _mapper = mapper;
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, QuizPutDto model)
+        [HttpGet]
+        public IActionResult Get()
         {
-            var foundQuiz = _dbContext.Quizzes.FirstOrDefault(x => x.Id == id);
+            var quiz = _dbContext.Quizzes.AsNoTracking().Select(x => _mapper.Map<Quiz,QuizGetDto>(x)).ToList();
+            
+            return Ok(quiz);
+        }
 
-            if (foundQuiz is null) return NotFound();
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult Get(int id)
+        {
+            var quiz = _dbContext.Quizzes.Include(q => q.Questions).ThenInclude(q => q.Options).SingleOrDefault(x => x.Id == id);
 
-            _mapper.Map(model, foundQuiz);
+            if (quiz == null) return NotFound();
+            
+            var dto = _mapper.Map<Quiz,QuizDetailedGetDto>(quiz);
+            
+            return Ok(dto);
+        }
 
+        [HttpPost]
+        public IActionResult Post([FromBody] QuizPostDto dto)
+        {
+            var quiz = _mapper.Map<QuizPostDto, Quiz>(dto);
+
+            _dbContext.Quizzes.Add(quiz);
             _dbContext.SaveChanges();
 
             return Ok();
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpPut("{id}")]
+        public IActionResult Put([FromBody] QuizPutDto dto, int id)
         {
-            var quizzes = _dbContext.Quizzes.Select(x=>_mapper.Map<Quiz,QuizGetDto>(x)).ToList();
+            var quiz = _dbContext.Quizzes.FirstOrDefault(x => x.Id == id);
+            if (quiz == null) return NotFound();
 
-            return Ok(quizzes);
+            _mapper.Map(dto, quiz);
+
+            _dbContext.Update(quiz);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
-    }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var quiz = _dbContext.Quizzes.Include(q => q.Questions).ThenInclude(q => q.Options).SingleOrDefault(x => x.Id == id);
+
+            if (quiz == null) return NotFound();
+
+            _dbContext.Quizzes.Remove(quiz);
+
+            _dbContext.SaveChanges();
+
+            return Ok();
+        }
+    }   
 }

@@ -2,11 +2,10 @@
 
 namespace WebApplication1.DTOs.Quiz
 {
-    public class QuizDetailedGetDto
+    public class QuizPostDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public DateTime CreationDate { get; set; }
-        public List<QuestionGetDto> Questions { get; set; }
+        public List<QuestionPostDto> Questions { get; set; }
     }
 }

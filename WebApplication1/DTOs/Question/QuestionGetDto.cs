@@ -1,4 +1,5 @@
 ﻿using WebApplication1.DTOs.Option;
+using WebApplication1.DTOs.Quiz;
 
 namespace WebApplication1.DTOs.Question
 {

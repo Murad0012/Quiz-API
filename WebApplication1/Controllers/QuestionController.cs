@@ -1,26 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.DTOs.Question;
-using WebApplication1.Entities;
 
 namespace WebApplication1.Controllers
 {
-    public class QuestionController : Controller
+    public class QuestionController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
-        public QuestionController(AppDbContext dbContext)
+        private readonly IMapper _mapper;
+
+        public QuestionController(AppDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
-        public IActionResult Put(int id,QuestionPutDto model)
+
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, QuestionPutDto dto)
         {
-            var foundQuestion = _dbContext.Questions.FirstOrDefault(x => x.Id == id);
+            var question = _dbContext.Questions.FirstOrDefault(x => x.Id == id);
 
-            if(foundQuestion is null) return NotFound();
+            if (question == null) return NotFound();
 
-            foundQuestion.Name = model.Name;
-            foundQuestion.Points = model.Points ;
+            _mapper.Map(dto, question);
 
+            _dbContext.Update(question);
             _dbContext.SaveChanges();
 
             return Ok();

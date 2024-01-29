@@ -19,6 +19,13 @@ namespace WebApplication1
                 opt.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             });
 
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
             var app = builder.Build();
 
             app.UseHttpsRedirection();
